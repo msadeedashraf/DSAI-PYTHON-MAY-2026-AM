@@ -30,6 +30,15 @@ print(myStringNumber+ str(num2))
 
 print(int(myStringNumber)*num2)
 
+number1 = float(input('Enter the number: '))
+number2 = float(input('Enter the number: '))
+number3 = float(input('Enter the number: '))
+
+average  = (number1 + number2 + number3) / 3
+
+print('The average for the three numbers is : ', round(average, 2))
+
+
 
 
 
