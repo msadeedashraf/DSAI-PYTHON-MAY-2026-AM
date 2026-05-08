@@ -1,0 +1,1 @@
+product_name = input("Enter product name")

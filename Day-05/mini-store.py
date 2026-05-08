@@ -45,3 +45,5 @@ total_inventory_value = (product_1_price * product_1_stock +
 print("Total Inventory Value : $", total_inventory_value)
 
 print("===========================")
+
+# Add the 4th product
