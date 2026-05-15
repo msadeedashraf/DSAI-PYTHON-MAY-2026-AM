@@ -2,7 +2,6 @@
 # ****-****-****-3233
 
 s = 'Sadeed123'
-
 m = "we are learning Python"
 
 print(len(s),  s[6])
