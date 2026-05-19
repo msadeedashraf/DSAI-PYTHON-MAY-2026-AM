@@ -2,6 +2,7 @@ balance = 1000
 transactions =  []
 from datetime import datetime
 
+FILE_NAME = 'bank_statement.txt'
 
 print(datetime.now())
 
@@ -45,6 +46,71 @@ def withdraw(amount):
 
     print(f"Withdrawn : {amount}")
     print(f"New Balance : {balance}")
+
+
+def create_statement():
+    if (transactions) == 0: 
+        print("No transaction to display.")
+        return
+
+    file_path = f"D:\\CBC\\DSAI-Jan-2026-AM\\05-Python\\DSAI-PYTHON-MAY-2026-AM\\Day-11\\statements\\{FILE_NAME}"
+
+    # print(file_path)
+
+    with open(file_path, "w") as file:
+
+            file.write("============================================================\n")
+            file.write("                    SADEED NATIONAL BANK\n")
+            file.write("============================================================\n")
+            file.write("Account Holder : Student Demo Account\n")
+            file.write("Account Number : **** **** **** 1234\n")
+            file.write(f"Statement Date : {datetime.now()}\n")
+            file.write("Currency       : CAD\n")
+            file.write("============================================================\n\n")
+
+            file.write(
+                f"{'Date':<12}"
+                f"{'Time':<12}"
+                f"{'Description':<15}"
+                f"{'Money In':>12}"
+                f"{'Money Out':>12}"
+                f"{'Balance':>12}\n"
+            )
+
+            file.write("-" * 75 + "\n")
+
+            for transaction in transactions:
+
+                file.write(
+                    f"{transaction[0]:<12}"
+                    f"{transaction[1]:<12}"
+                    f"{transaction[2]:<15}"
+                    f"${transaction[3]:>11.2f}"
+                    f"${transaction[4]:>11.2f}"
+                    f"${transaction[5]:>11.2f}\n"
+                )
+
+            file.write("-" * 75 + "\n")
+            file.write(f"{'Closing Balance':>63}: ${balance:.2f}\n")
+            file.write("============================================================\n")
+
+            print("\nStatement created successfully.")
+            print(f"Saved At: {file_path}")
+
+
+
+def read_statment():
+    
+    try:
+        with open(FILE_NAME, 'r') as file:
+            print("\n")
+            print(file.read())
+    except FileNotFoundError:
+        print("\n Statement file not found.")
+
+
+    
+
 
 def showstatement():
     if (transactions) == 0: 
@@ -90,6 +156,8 @@ def main():
         print("2. Withdraw")
         print("3. Show Statement")
         print("4. Quit")
+        print("5. Read Statement")
+        print("6. Create Statement")
         print("=====================================")
 
         choice = input("Slect the option")
@@ -105,6 +173,13 @@ def main():
         elif choice == "3":
             showstatement()
 
+        elif choice == "5":
+            read_statment()
+
+        elif choice == "6":
+            create_statement()
+
+            
 
         elif choice == "4":
             print("Thank you for using our bank")
