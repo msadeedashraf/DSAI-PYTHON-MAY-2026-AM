@@ -3,6 +3,7 @@ class BankAccount:
         self.account_holder_name = account_holder_name
         self.balance = balance
 
+
     def deposit(self, amount):
         if amount == 0:
             print("Deposit amount can not be equal to zero")
