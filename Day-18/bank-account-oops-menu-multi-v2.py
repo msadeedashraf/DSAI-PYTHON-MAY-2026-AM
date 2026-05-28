@@ -1,6 +1,7 @@
 # If you wana generate IBAN from a python package https://schwifty.readthedocs.io/en/latest/examples.html#generation
 # OOPs Bank Account with Menu
 #How to have multiple accounts
+# Implement the list for holding transactions
 
 import random
 from datetime import datetime
@@ -8,11 +9,14 @@ from datetime import datetime
 class BankAccount:
     global bank_name 
     bank_name = "SADEED NATIONAL BANK"
+    transactions = []          # LIST: stores all transaction dictionaries
+    transaction_types = set()  # SET: stores unique transaction types only
 
     def __init__  (self, account_holder_name, balance=0):
         self.account_holder_name = account_holder_name
-        self.balance = balance
+        self.balance = balance        
         self.account_number = self.generate_iban()
+        self.transactions = []
         self.creation_date = datetime.now()
         self.is_active = False
 
@@ -44,14 +48,22 @@ class BankAccount:
 
         account = cls(name, opening_balance)
 
-        print(f"|n Account created successfully!")
+        print(f"\n Account created successfully!")
         print(f"{account.account_holder_name}'s account number is {account.account_number}")
         print(f"Account no is currently inactive. Please activate the account")
 
         return account
 
 
+    def get_timstamp(self):
+        current_time = datetime.now()
 
+        timestamp = (
+        current_time.strftime("%Y-%m-%d"), # Date part from the current date
+        current_time.strftime("%I:%M:%S") # Time Part from the current date
+
+            )
+        return timestamp
         
 
 
@@ -65,8 +77,23 @@ class BankAccount:
         
         self.balance += amount
 
-        print(f"Deposited : {amount}")
-        print(f"New Balance : {self.balance}")
+        timestamp = self.get_timstamp()
+
+         # Dictionary
+        transaction = {
+        'type':'Deposit',
+        'date':timestamp[0],
+        'time': timestamp[1],
+        'money_in': amount,
+        'money_out':0,
+        'balance': self.balance
+        }
+        
+        self.transactions.append(transaction)
+
+        print(f"Dposited : {amount} successfully." ) 
+        print(f"New Balance for {self.account_holder_name} : {self.balance}")
+
 
     def withdraw(self, amount):
         if amount > self.balance:
@@ -76,8 +103,22 @@ class BankAccount:
         fee = 2
         amount += fee 
         self.balance -= amount
-        print(f"Withdraw: {amount}")
-        print(f"New Balance : {self.balance}")
+
+        timestamp = self.get_timstamp()
+         # Dictionary
+        transaction = {
+            'type':'Deposit',
+            'date':timestamp[0],
+            'time': timestamp[1],
+            'money_in': 0,
+            'money_out':amount,
+            'balance': self.balance
+        }
+
+        self.transactions.append(transaction)
+
+        print(f"Withdraw : {amount-fee}")
+        print(f"New Balance is : {self.balance}")
 
     def check_balance(self):
         print(f"Curent Balance of {self.account_holder_name} is {self.balance}")
@@ -91,6 +132,44 @@ class BankAccount:
         print(f"Creation Date       : {self.creation_date.strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"Account Active      : {self.is_active}")
         print("==================================")
+
+        # =========================================================
+    # FUNCTION: SHOW STATEMENT ON SCREEN
+    # =========================================================
+    def show_statement(self):
+                
+        if len(self.transactions) == 0:
+            print("\nNo transactions to display.")
+            return
+
+        print("\n==============================================================")
+        print(f"                     {bank_name}                               ")
+        print("================================================================")
+
+        print(
+            f"{'Date':<12}"
+            f"{'Time':<12}"
+            f"{'Description':<15}"
+            f"{'Money In':>12}"
+            f"{'Money Out':>12}"
+            f"{'Balance':>12}"
+        )
+
+        print("-" * 75)
+
+        for transaction in self.transactions:
+            print(
+                f"{transaction['date']:<12}"
+                f"{transaction['time']:<12}"
+                f"{transaction['type']:<15}"
+                f"${transaction['money_in']:>11.2f}"
+                f"${transaction['money_out']:>11.2f}"
+                f"${transaction['balance']:>11.2f}"
+            )
+
+        print("-" * 75)
+        print(f"{'Closing Balance':>63}: ${self.balance:.2f}")
+
 
 def find_account(accounts):
     account_number = input("Enter the account number")
@@ -157,7 +236,8 @@ def main():
         print("6. Show Balance")
         print("7. Show Acount Info")
         print("8. List all Accounts")
-        print("9. Quit")
+        print("9. Show Statement")
+        print("10. Quit")
         print("=======================================")
 
         choice = input("Select an option: ")
@@ -222,10 +302,16 @@ def main():
             account = find_account(accounts)
             if account: 
                 account.account_info()
+                
         elif choice == "8":
             list_allaccounts(accounts)
-        
+
         elif choice == "9":
+            account = find_account(accounts)
+            if account: 
+                account.show_statement()
+        
+        elif choice == "10":
             print("\nThank you for using our bank.")
             break
 
