@@ -17,13 +17,27 @@ class BankAccount:
     transaction_types = set()  # SET: stores unique transaction types only
 
     def __init__  (self, account_holder_name, balance=0):
-        self.account_holder_name = account_holder_name
-        self.balance = balance        
+        self._account_holder_name = account_holder_name
+        self._balance = balance        
         self.account_number = self.generate_iban()
-        self.transactions = []
+        self._transactions = []
         self.creation_date = datetime.now()
         self.account_type = "Regular Account"
-        self.is_active = False
+        self._is_active = False
+
+    @property
+    def balance(self):
+        return self._balance
+    @property
+    def account_holder_name(self):
+        return self._account_holder_name
+    @property
+    def transactions(self):
+        return self._transactions
+    @property
+    def is_active(self):
+        return self._is_active
+    
 
 
     def generate_iban(self):
@@ -34,14 +48,29 @@ class BankAccount:
         return f"{country_code}{check_digits}{bank_identifier}{account_number}"
     
     def activate_account(self):
-        self.is_active = True
+        self._is_active = True
         print(f"Account {self.account_number} is activated")
 
 
     def de_activate_account(self):
-        self.is_active = False
+        self._is_active = False
         print(f"Account {self.account_number} is deactivated")
 
+
+    def _add_transaction(self, transaction_type, money_in , money_out):
+         
+        timestamp = self.get_timstamp()
+         # Dictionary
+        transaction = {
+            'type':'Withdrawal',
+            'date':timestamp[0],
+            'time': timestamp[1],
+            'money_in': money_in,
+            'money_out':money_out,
+            'balance': self.balance
+        }
+
+        self._transactions.append(transaction)
 # cls @classmethod
     @classmethod
     def open_account(cls):
@@ -88,55 +117,45 @@ class BankAccount:
 
 
     def deposit(self, amount):
-        if self.is_active == False:
-            return print(f"{self.account_holder_name}'s account is not active. \n Please contact the branch before the deposit")
+        if self._is_active == False:
+            return print(f"{self._account_holder_name}'s account is not active. \n Please contact the branch before the deposit")
 
         if amount <= 0:
             print("Deposit amount can not be equal to zero")
             return
         
-        self.balance += amount
+        self._balance += amount
 
-        timestamp = self.get_timstamp()
+        self._add_transaction("Deposit", amount, 0)       
 
-         # Dictionary
-        transaction = {
-        'type':'Deposit',
-        'date':timestamp[0],
-        'time': timestamp[1],
-        'money_in': amount,
-        'money_out':0,
-        'balance': self.balance
-        }
-        
-        self.transactions.append(transaction)
-
+       
         print(f"Dposited : {amount} successfully." ) 
-        print(f"New Balance for {self.account_holder_name} : {self.balance}")
+        print(f"New Balance for {self._account_holder_name} : {self._balance}")
 
 
     def withdraw(self, amount):
-        if amount > self.balance:
+        if not self._is_active:
+            print("Account must be active before withdrawing.")
+            return
+
+        if amount <= 0:
+            print("Withdrawal amount must be greater than zero.")
+            return
+
+        if amount > self._balance:
             print("Insufficient funds")
             return
         
-        self.balance -= amount
+        self._balance -= amount
 
-        timestamp = self.get_timstamp()
-         # Dictionary
-        transaction = {
-            'type':'Withdrawal',
-            'date':timestamp[0],
-            'time': timestamp[1],
-            'money_in': 0,
-            'money_out':amount,
-            'balance': self.balance
-        }
-
-        self.transactions.append(transaction)
+        self._add_transaction("Withdraw",  0, amount)       
 
         print(f"Withdraw : {amount}")
-        print(f"New Balance is : {self.balance}")
+        print(f"New Balance is : {self._balance}")
+
+
+   
+
 
     def check_balance(self):
         print(f"Curent Balance of {self.account_holder_name} is {self.balance}")
@@ -213,33 +232,25 @@ class SavingsAccount(BankAccount):
     def __init__(self, account_holder_name, balance, interest_rate=0.03):
         super().__init__(account_holder_name, balance)
 
-        self.interest_rate = interest_rate
+        self._interest_rate = interest_rate
         self.account_type = "Savings Account"
-
+    
+    @property
+    def interest_rate(self):
+        return self._interest_rate
 
     def add_interest(self):
-        if not self.is_active:
+        if not self._is_active:
             print("Account must be active before adding interest.")
             return
         
-        interest = self.balance * self.interest_rate
-        self.balance += interest
+        interest = self._balance * self._interest_rate
+        self._balance += interest
 
-        timestamp = self.get_timstamp()
-         # Dictionary
-        transaction = {
-            'type':'Iterest',
-            'date':timestamp[0],
-            'time': timestamp[1],
-            'money_in': interest,
-            'money_out':0,
-            'balance': self.balance
-        }
-
-        self.transactions.append(transaction)
-
+        self._add_transaction("interest", interest, 0)
+        
         print(f"Interest Added : {interest}")
-        print(f"New Balance is : {self.balance}")
+        print(f"New Balance is : {self._balance}")
 
 
 
@@ -247,38 +258,30 @@ class ChequingAccount(BankAccount):
     def __init__(self, account_holder_name, balance, withdrwal_fee = 4):
         super().__init__(account_holder_name, balance)
         self.account_type = "Chequing Account"
-        self.withdrawal_fee = withdrwal_fee
+        self._withdrawal_fee = withdrwal_fee
         
-
+    @property
+    def withdrawal_fee(self):
+        return self._withdrawal_fee
+    
     def withdraw(self, amount):
-        if not self.is_active:
+        if not self._is_active:
             print("Account must be active before withdrawing")
             return
         
-        total_amount = amount + self.withdrawal_fee
+        total_amount = amount + self._withdrawal_fee
         
-        if total_amount > self.balance:
+        if total_amount > self._balance:
             print("Insufficient funds")
             return
         
-        self.balance -= total_amount
+        self._balance -= total_amount
 
-        timestamp = self.get_timstamp()
-         # Dictionary
-        transaction = {
-            'type':'Withdrawal',
-            'date':timestamp[0],
-            'time': timestamp[1],
-            'money_in': 0,
-            'money_out':total_amount,
-            'balance': self.balance
-        }
-
-        self.transactions.append(transaction)
+        self._add_transaction("withdrawal", 0 , total_amount)        
 
         print(f"Withdraw : {amount} successfully")
-        print(f"Fee applied : {self.withdrawal_fee}")
-        print(f"New Balance for {self.account_holder_name} is {self.balance}")
+        print(f"Fee applied : {self._withdrawal_fee}")
+        print(f"New Balance for {self._account_holder_name} is {self._balance}")
 
 
 def main():
