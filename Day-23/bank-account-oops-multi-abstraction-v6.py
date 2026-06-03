@@ -5,13 +5,31 @@
 # Implement inheritance (Saving and Chequing Account)
 # Implement Overriding
 # Implement Encapsulation
-
+# Implement Abstraction
 
 
 import random
 from datetime import datetime
+from abc import ABC, abstractmethod
 
-class BankAccount:
+class Account(ABC):
+    @abstractmethod
+    def deposit(self, amount):
+        pass
+
+    @abstractmethod
+    def withdraw(self, amount):
+        pass
+    
+    @abstractmethod
+    def check_balance(self):
+        pass
+
+    @abstractmethod
+    def get_account_benefits(self):
+        pass
+
+class BankAccount(Account):
     global bank_name 
     bank_name = "SADEED NATIONAL BANK"
     transactions = []          # LIST: stores all transaction dictionaries
